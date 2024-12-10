@@ -424,7 +424,7 @@ server <- function(input, output) {
   })
 }
 
-knitr::include_graphics("figs/visualisation 1.png")
+shinyApp(ui, server)
 
 ```
 
