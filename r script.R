@@ -1,4 +1,4 @@
-#Shinyapp.io was struggling to find functions from plotly
+#Shinyapp.io was struggling to find functions from plotly (lines 1-8 can be ignored unless looking to deploy the app)
 install.packages("plotly")
 rsconnect::deployApp(forceUpdate = TRUE)
 

@@ -208,3 +208,10 @@ ui - user interface for the interactive plot
 server - defining inputs and outputs
 
 final_results - the scraped and wrangled data (raw data was not saved as it was easier to wrangle within the for loop, all raw data can be easily accessed at the links provided)
+
+
+Notes:
+
+> The r script and rmarkdown coding chunks are different as the shiny app doesn't imbed directly into the rendered html so requires a screenshot and link. When the r script is run it will open the app directly.
+> When the r script is run it will open the shiny app, this halts the the rest of the code from running until the app is closed. If you want to view the box plot and violin plot overlay you must shut the app and the code will automatically carry on running (or just select the final bit of code and run it once all variables are created)
+> If you would like to change the interactive plot to a box plot instead of a violin plot, copy the vcode from the "initial visualisation" section of the index.rmd file and paste it over the corresponding server function on the r script

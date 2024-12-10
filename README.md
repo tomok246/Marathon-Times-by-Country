@@ -35,4 +35,13 @@ Data provided by London marathon is of free use, participants must opt out of al
 
 Data Source: The data used in this analysis is sourced from the official London Marathon results and publicly available marathon data.
 
-Shiny: This project utilizes the Shiny package for building interactive web applications in R.
+Shiny: This project utilizes the Shiny package for building interactive web applications in R. This includes deploying the app to shinyapp.io
+
+## Final Notes
+
+> All country codes are defined as their country in the codebook
+> All data sources are supplied as links in the codebook
+> Edits to the r script to change between the 3 visualisations shown are described in the codebook
+> Variables are described in the codebook
+> File uses are described in the codebook
+> Unless looking ot deploy the shiny app to shinyapp.io the renv files and folder, ui.R, server.R, lines prior to line 9 of the r script, and rsconnect are not required to run the code and produce the shiny app
