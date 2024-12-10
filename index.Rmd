@@ -1,9 +1,22 @@
 ---
-title: "Marathon Time by Country"
+title: "Country-Specific Insights: Marathon Performance Analysis"
+subtitle: "London Marathon 2024"
+author: "reg-240227083"
 output:
-  html_document: default
-  pdf_document: default
-date: "2024-12-09"
+  pdf_document:
+    toc: true
+    latex_engine: xelatex
+  html_document:
+    self_contained: true
+    highlight: tango
+    code_folding: show
+    toc: true
+    number_sections: true
+    toc_float:
+      collapsed: false
+always_allow_html: true
+date: "09/12/2024"
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +25,9 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 
 # **Introduction and Research Question**
 
-The London Marathon is one of the most popular marathons worldwide, and makes up one of the big 6. Participants come from all across the world to compete, whether it be within the Elite group or the Mass group. With so many countries involved, this project looks to answer the question: How did each country perform at the London Marathon 2024? It will look to provide insight into each countries average finish time, the distribution of times, the fastest time, the slowest time, and many other interpretations.
+The London Marathon is one of the most prestigious and widely celebrated marathons in the world, forming part of the renowned "Big 6" marathon series. Each year, participants from across the globe gather to compete, whether as part of the Elite group or the Mass group. With such a diverse range of countries represented, this project aims to explore a central question: How did each country perform at the 2024 London Marathon?
+
+By analyzing data from the event, the project provides insights into key performance metrics, including each country's average finish time, the distribution of finish times, the fastest and slowest recorded times, and other meaningful patterns. Through this analysis, we hope to uncover intriguing stories behind the numbers and celebrate the global spirit of the marathon.
 
 # **Loading Packages**
 
@@ -35,10 +50,13 @@ library(rsconnect)
 ```
 
 
-# **Obtaining and Cleaning Data**
+# **Obtaining and Wrangling Data**
 
-The data was obtained via scraping the London Marathon 2024 results page: (link?)
-Initially a data frame was created to save the data to, and a function was created to scrape the different URLs. This function removed unneeded aspects of the data, for example the country code was in the same data point as the participants name and thus the name had to be removed. It also had to remove the top line of the data pulled through as it included the column headers. Finally, certain participants did not have a country code and thus needed to removed from the data frame.
+The data was obtained via scraping the London Marathon 2024 results page:
+[London Marathon 2024 Elite Results](https://results.tcslondonmarathon.com/2024/?page=1&event=ELIT&pid=search&pidp=start&search%5Bsex%5D=%25&search%5Bage_class%5D=%25&search%5Bnation%5D=%25&search_sort=place_nosex)
+[London Marathon 2024 Mass Results](https://results.tcslondonmarathon.com/2024/?page=1&event=MAS&num_results=1000&pid=search&pidp=start&search%5Bsex%5D=%25&search%5Bage_class%5D=%25&search%5Bnation%5D=%25&search_sort=place_nosex)
+
+Initially a data frame was created to save the data to, and a function was created to scrape the different URLs. This function removed aspects of the data that weren't needed, for example the country code was in the same data point as the participants name and thus the name had to be removed. It also had to remove the top line of the data pulled through as it included the column headers. Finally, certain participants did not have a country code and thus needed to removed from the data frame.
 
 ```{r}
 # Initialize final results data frame
@@ -68,8 +86,9 @@ scrape_results <- function(url, category) {
 }
 ```
 
-The function was then used to scrape the data from the results page for the participants in the mass race and participants in the elite race. 
-The mass race with the maximum participants (1000) per page had 54 pages of results, this required a for loop to work through each page. To create a unique URL for the elite results it required having multiple pages. Therefore, 25 participants per page was used and a loop created to scrape the 2 pages. Sense checks were added to the scraping of each URL to show that the process was still ongoing, because the 54 page loop takes some time and could appear to be frozen.
+The function was then used to scrape the data from the mass and elite race results pages. 
+To create a unique URL both required the results being across multiple pages, thus scraping required the introduction of a 'for' loop to process each page. The mass event required 54 pages of 1000 participants. Whilst, the elite race required 2 pages of 25 participants.
+Sense checks were added to the scraping of each URL to show that the process was still ongoing, this was required due to the size of the mass race data to prove the code was still running.
 
 ```{r}
 # Scrape Mass participants (54 pages with 1000 participants each)
@@ -101,7 +120,7 @@ for (page_result in seq(from = 1, to = 2, by = 1)) {
 }
 ```
 
-The data for the finish time then needed to be converted into time in minutes to allow for better plotting
+To facilitate plotting and analysis, the finish times were converted into total minutes using the following code.
 
 ```{r}
 # Convert 'Time' column to total minutes
@@ -131,7 +150,7 @@ colnames(country_counts_df) <- c("Country", "Count")
 ```
 
 
-A column was added for continents and the country codes mapped to their relevant continent. This was done automatically for many of the countries via countrycode. However, the formatting of some of the country codes by London Marathon was incorrect, these countries had to manually have their continents mapped. This was to allow for the plot to select by continent.
+A column was added for continents and the country codes mapped to their relevant continent. This was done automatically for many of the countries via countrycode. However, the formatting of some of the country codes by London Marathon was incorrect, these countries had to manually have their continents mapped. This was to allow for the plot to select by continent. Countrycode auto grouped the Americas, so this was kept consistent in manual overrides.
 
 ```{r}
 # Function to assign continents with manual overrides
@@ -217,7 +236,7 @@ print(head(final_results, 5))
 
 # **Creating the Visualisation**
 
-Initially the user interface for the interactive plot must be defined
+The user interface for the interactive plot must be defined
 
 ```{r}
 # UI for the Shiny app
@@ -244,8 +263,10 @@ ui <- fluidPage(
 ```
 
 ## *Initial Visualisation*
-Initially, I planned to make an interactive plot that would allow you to select for different factors such as event type, continent and min participants. To achieve this i created an interactive box plot. This visualisation is shown as a png.
-(here we can also see a function being created for filtering the data within the plot)
+
+The main goal was to create an interactive plot that would allow users to explore the data by selecting various factors, such as event type, continent, and minimum participant thresholds. Initially the plan was to accomplish this with an interactive box plot, providing a dynamic way to visualise the data.
+
+This visualisation, presented as a PNG, demonstrates the filtering functionality, which was implemented through a custom function to dynamically adjust the data displayed within the plot. This approach ensures that the plot remains flexible and responsive to user preferences.
 
 ```{r}
 # Server logic for the Shiny app
@@ -312,7 +333,11 @@ knitr::include_graphics("figs/visualisation 1.png")
 
 ## *Final Visualisation*
 
-However, I believe a violin plot better demonstrates the distribution of times. It allows for a clearer visual on the common times for the country. Whilst the exact mean, min and max are not as clear as with the box plot, the interactive properties of the graph allow for this data to be acquired easily, whilst still allowing for a clear visualisation of distribution. Shown below is a screenshot of the plot, click the link below this code to take you to the interactive plot.
+However, I decided that a violin plot provides a more effective representation of the distribution of finish times compared to the previously used box plot. A violin plot offers a clearer visualization of the most common finish times for each country, making it easier to identify patterns in the data.
+
+While the exact mean, minimum, and maximum values are less immediately apparent compared to a box plot, the interactive features of the graph make it easy to access this detailed information when needed. Additionally, the violin plot retains the advantage of clearly illustrating the overall distribution. 
+
+Below is a screenshot of the interactive violin plot. Click the link below the code to access the fully interactive version.
 
 ```{r}
 # UI for the Shiny app
@@ -399,16 +424,19 @@ server <- function(input, output) {
   })
 }
 
-knitr::include_graphics("figs/viz240227083.png")
+knitr::include_graphics("figs/visualisation 1.png")
+
 ```
 
 
-**To view the interactive plot click [Here](https://tomok246.shinyapps.io/Marathon-Times-by-Country/)**
+<p style="font-size: 36px; font-weight: bold; text-align: center;">
+  To view the interactive plot click [Here](https://tomok246.shinyapps.io/Marathon-Times-by-Country/)
+</p>
 
 
 ## *Alternative Visualisation*
 
-An alternative visualisation would be to create an overlay of the box plot and the violin plot, this would therefore allow for an immediate viewing of both the distribution of times and the mean, min and max times. However, this plot would not be interactive and would therefore require selecting countries from those included. The example code below creates the plot for the countries with the top 10 participants. This plot would be used in a visualisation where links could not be clicked to access the interactive plot.
+An alternative visualisation would be to create an overlay of the box plot and the violin plot, this would therefore allow for an immediate viewing of both the distribution of times and the mean, min and max times. However, this plot would not be interactive and would therefore require selecting countries within the code prior to creating the visual. The example code below creates the plot for the countries with the top 10 participants. This plot would be used in a visualisation where links could not be clicked to access the interactive plot.
 
 ```{r}
 #visualisation 3
@@ -464,13 +492,17 @@ cat("Plot saved successfully.\n")
 p
 ```
 
-# *Discussion*
+# **Discussion**
 
-From the final visualisation, the interactive violin plot reveals a wealth of insights. For the countries with the top 5 participants, we observe that France has the lowest average finish time, the UK has the fastest time, and Italy shows the most consistent distribution, as indicated by its relatively even kernel shape compared to the others. In the Elite category, the plot is particularly interesting due to the Kenyan victory. While Kenya has the fastest time, its distribution is noticeably skewed toward higher values. Lastly, among countries with at least 600 participants, France stands out with a short, wide kernel, indicating the greatest consistency in finish times. Overall, the plot offers a range of interpretations, providing valuable insights into each country’s performance at the London Marathon 2024.
+The interactive violin plot provides a wealth of insights into the performance of participants at the London Marathon 2024. Among the countries with the top five participant numbers, France stands out with the lowest average finish time, while the UK recorded the fastest individual time. Italy, on the other hand, demonstrated the most consistent distribution, as reflected by its relatively uniform kernel shape compared to the other nations.
 
-# *Limitations*
+In the Elite category, the plot highlights an especially intriguing result with Kenya's victory. While Kenya secured the fastest time, its distribution skews noticeably toward longer finish times, suggesting a broader spread in performance among its participants. Lastly, for countries with at least 600 participants, France again stands out with a short, wide kernel, indicating the highest consistency in finish times across its participants. Overall, the violin plot serves as a powerful tool for uncovering patterns and offering valuable insights into each country’s performance.
 
-A key limitation to this is that the data is scraped from the London marathon, and therefore we expect a higher proportion of participants from the UK. Furthermore, the London marathon requires a qualifying time to have previously been achieve (you can also gain entry through charities, hence the number of participants with slower times), this means that the participants are on average better runners than most marathon participants. To mitigate these limitations, it would require scraping and collating data from a number of marathons throughout the year, including those without qualifying times and a higher acceptance rate.
+# **Limitations**
+
+One notable limitation of this analysis is that the data is scraped exclusively from the London Marathon, leading to a higher representation of participants from the UK. Additionally, the London Marathon requires participants to meet qualifying times for entry (though some gain entry through charity spots), which skews the data toward faster runners compared to the general marathon population. This results in an analysis that may not fully reflect the diversity of marathon performances globally.
+
+To address these limitations, future work could involve scraping and aggregating data from multiple marathons throughout the year, including those with less stringent entry requirements and higher acceptance rates. This would provide a more comprehensive view of global marathon trends and performance distributions.
 
 
 
