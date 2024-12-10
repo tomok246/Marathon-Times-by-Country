@@ -3,10 +3,10 @@ title: "Country-Specific Insights: Marathon Performance Analysis"
 subtitle: "London Marathon 2024"
 author: "reg-240227083"
 output:
-    pdf_document:
+  pdf_document:
     toc: true
     latex_engine: xelatex
-    html_document:
+  html_document:
     self_contained: true
     highlight: tango
     code_folding: show
